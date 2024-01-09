@@ -5,24 +5,10 @@ import (
 	"books-api/util"
 	"context"
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
 )
-
-func deleteAllBooks() {
-	err := db.WithTX(context.Background(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		err := queries.DeleteAllBooks(ctx, tx)
-		if err != nil {
-			return err
-		}
-		return err
-	})
-	if err != nil {
-		log.Fatalf("Could not delete all books: %s", err)
-	}
-}
 
 func TestMain(m *testing.M) {
 	util.SetupIntegrationTest(m)
@@ -34,7 +20,7 @@ func TestConnect(t *testing.T) {
 
 // Test get, create, update, delete
 func TestGetBooksAndCreateWorks(t *testing.T) {
-	deleteAllBooks()
+	util.BeforeEach()
 	books := []db.Book{}
 	ctx := context.Background()
 	err := db.WithTX(ctx, func(txCtx context.Context, q *db.Queries, tx pgx.Tx) error {
@@ -84,7 +70,7 @@ func TestGetBooksAndCreateWorks(t *testing.T) {
 }
 
 func TestUpdateBook(t *testing.T) {
-	deleteAllBooks()
+	util.BeforeEach()
 	books := []db.Book{}
 	ctx := context.Background()
 	err := db.WithTX(ctx, func(txCtx context.Context, q *db.Queries, tx pgx.Tx) error {
@@ -142,7 +128,7 @@ func TestUpdateBook(t *testing.T) {
 }
 
 func TestDeleteBook(t *testing.T) {
-	deleteAllBooks()
+	util.BeforeEach()
 	books := []db.Book{}
 	ctx := context.Background()
 	err := db.WithTX(ctx, func(txCtx context.Context, q *db.Queries, tx pgx.Tx) error {

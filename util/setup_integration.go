@@ -2,12 +2,14 @@ package util
 
 import (
 	"books-api/db"
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/ory/dockertest/v3"
 )
 
@@ -42,4 +44,17 @@ func SetupIntegrationTest(m *testing.M) {
 	}
 
 	os.Exit(code)
+}
+
+func BeforeEach() {
+	err := db.WithTX(context.Background(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
+		err := queries.DeleteAllBooks(ctx, tx)
+		if err != nil {
+			return err
+		}
+		return err
+	})
+	if err != nil {
+		log.Fatalf("Could not delete all books: %s", err)
+	}
 }
