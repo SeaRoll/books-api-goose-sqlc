@@ -65,12 +65,15 @@ docker compose -f deployment/docker-compose.yml down
 ├── deployment
 │   ├── Dockerfile              # dockerfile for building api
 │   ├── docker-compose.yml      # compose file for deploying db + api
-│   └── docker-compose.ci.yml   # compose file for deploying db (tests)
 ├── api
 │   ├── api.go                  # initialize api and routes
 │   └── books.go                # books routes
 ├── handler
 │   └── books.go                # book handlers
+├── test
+│   ├── suit_test.go            # setup and teardown for tests
+│   ├── util_test.go            # util functions for tests
+│   └── books_test.go           # book tests
 ├── main.go                     # main file
 ├── go.mod                      # go modules file
 ├── go.sum                      # go modules file

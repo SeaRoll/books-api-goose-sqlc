@@ -8,8 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func returnSuccess(c echo.Context) error {
-	return c.JSON(200, SuccessDTO{Success: true})
+func returnSuccess(statusCode int, c echo.Context) error {
+	return c.JSON(statusCode, SuccessDTO{Success: true})
 }
 
 func returnUserError(c echo.Context, err error) error {

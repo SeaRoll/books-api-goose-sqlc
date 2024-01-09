@@ -57,7 +57,7 @@ func CreateBook(c echo.Context) error {
 	if err != nil {
 		return returnServerError(c, err)
 	}
-	return returnSuccess(c)
+	return returnSuccess(201, c)
 }
 
 func UpdateBook(c echo.Context) error {
@@ -83,7 +83,7 @@ func UpdateBook(c echo.Context) error {
 		return returnServerError(c, err)
 	}
 
-	return returnSuccess(c)
+	return returnSuccess(200, c)
 }
 
 func DeleteBook(c echo.Context) error {
@@ -104,5 +104,5 @@ func DeleteBook(c echo.Context) error {
 		return returnServerError(c, err)
 	}
 
-	return returnSuccess(c)
+	return returnSuccess(200, c)
 }
