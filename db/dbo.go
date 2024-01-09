@@ -28,6 +28,11 @@ func Connect() {
 	migrate(dbo)
 }
 
+func Disconnect() {
+	DB.Close()
+	DB = nil
+}
+
 func WithTX(ctx context.Context, fn func(context.Context, *Queries, pgx.Tx) error) error {
 	queries := New()
 	tx, err := DB.Begin(ctx)

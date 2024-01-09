@@ -4,7 +4,7 @@ FROM books
 OFFSET $1
 LIMIT $2;
 
--- name: InsertBook :exec
+-- name: InsertBook :one
 INSERT INTO books (title, author, description)
 VALUES ($1, $2, $3)
 RETURNING id;
@@ -17,6 +17,9 @@ WHERE id = $1;
 -- name: DeleteBook :exec
 DELETE FROM books
 WHERE id = $1;
+
+-- name: DeleteAllBooks :exec
+DELETE FROM books;
 
 -- name: GetConditions :many
 SELECT time_bucket('1 minute', time)::timestamptz AS bucket,

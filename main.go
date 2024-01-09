@@ -18,6 +18,7 @@ func initConfig() {
 func main() {
 	initConfig()
 	db.Connect()
+	defer db.Disconnect()
 	apio := api.New()
 	api.Run(apio)
 }

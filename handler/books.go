@@ -47,11 +47,12 @@ func CreateBook(c echo.Context) error {
 	}
 
 	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		return queries.InsertBook(ctx, tx, db.InsertBookParams{
+		_, err := queries.InsertBook(ctx, tx, db.InsertBookParams{
 			Title:       insertParams.Title,
 			Author:      insertParams.Author,
 			Description: insertParams.Description,
 		})
+		return err
 	})
 	if err != nil {
 		return returnServerError(c, err)

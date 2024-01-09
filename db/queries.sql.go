@@ -11,6 +11,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const deleteAllBooks = `-- name: DeleteAllBooks :exec
+DELETE FROM books
+`
+
+func (q *Queries) DeleteAllBooks(ctx context.Context, db DBTX) error {
+	_, err := db.Exec(ctx, deleteAllBooks)
+	return err
+}
+
 const deleteBook = `-- name: DeleteBook :exec
 DELETE FROM books
 WHERE id = $1
@@ -54,7 +63,7 @@ func (q *Queries) GetConditions(ctx context.Context, db DBTX) ([]GetConditionsRo
 	return items, nil
 }
 
-const insertBook = `-- name: InsertBook :exec
+const insertBook = `-- name: InsertBook :one
 INSERT INTO books (title, author, description)
 VALUES ($1, $2, $3)
 RETURNING id
@@ -66,9 +75,11 @@ type InsertBookParams struct {
 	Description string
 }
 
-func (q *Queries) InsertBook(ctx context.Context, db DBTX, arg InsertBookParams) error {
-	_, err := db.Exec(ctx, insertBook, arg.Title, arg.Author, arg.Description)
-	return err
+func (q *Queries) InsertBook(ctx context.Context, db DBTX, arg InsertBookParams) (int32, error) {
+	row := db.QueryRow(ctx, insertBook, arg.Title, arg.Author, arg.Description)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
 }
 
 const insertCondition = `-- name: InsertCondition :exec
