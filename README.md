@@ -71,7 +71,7 @@ docker compose -f deployment/docker-compose.yml down
 ├── handler
 │   └── books.go                # book handlers
 ├── test
-│   ├── suit_test.go            # setup and teardown for tests
+│   ├── suite_test.go           # setup and teardown for tests
 │   ├── util_test.go            # util functions for tests
 │   └── books_test.go           # book tests
 ├── main.go                     # main file
