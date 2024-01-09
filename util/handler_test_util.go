@@ -10,6 +10,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func ParseBodyString[T any](body *bytes.Buffer, result *T) error {
+	return json.Unmarshal(body.Bytes(), result)
+}
+
+func BuildJsonRequest(method string, url string, body interface{}) *http.Request {
+	if body == nil {
+		return httptest.NewRequest(method, url, nil)
+	}
+	req := httptest.NewRequest(method, url, EncodeJSON(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	return req
+}
+
 func EncodeJSON(data interface{}) *bytes.Buffer {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(data)
