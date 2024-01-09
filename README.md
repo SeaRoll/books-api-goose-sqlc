@@ -4,14 +4,7 @@
 
 This is a simple CRUD API for books.
 
-```
-{
-  "id": 1,
-  "title": "The Lord of the Rings",
-  "author": "J. R. R. Tolkien",
-  "description": "The Lord of the Rings is an epic high fantasy novel written by English author and scholar J. R. R. Tolkien.",
-}
-```
+API Documentation: [API.md](API.md)
 
 ## Used dependencies
 
@@ -21,6 +14,7 @@ This is a simple CRUD API for books.
 - `goose` for database migrations
 - `echo` for routing
 - `playground/validator` for validating request DTOs
+- `testify` for testing
 
 ## Installation
 
