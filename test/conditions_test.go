@@ -35,6 +35,10 @@ func generateConditionDTO(day int) *handler.InsertConditionDTO {
 		Device:      "A",
 		Temperature: randomTemperature,
 		Humidity:    randomHumidity,
+		Value: map[string]interface{}{
+			"temperature": randomTemperature,
+			"humidity":    randomHumidity,
+		},
 	}
 }
 
@@ -49,7 +53,9 @@ func (suite *HandlerTestSuite) TestMassInsertions() {
 	for i := 0; i < 1000; i++ {
 		insertCondition(*generateConditionDTO(i / 100))
 	}
-	res, err := PerformRequest(BuildJsonRequest(http.MethodGet, "/conditions", nil), handler.GetConditions, nil)
+	res, err := PerformRequest(BuildJsonRequest(http.MethodGet, "/conditions", nil), handler.GetConditionsJsonValue, &PathParams{
+		"key": "temperature",
+	})
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), 200, res.Code)
 	fmt.Println(res.Body.String())

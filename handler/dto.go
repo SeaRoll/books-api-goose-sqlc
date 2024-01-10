@@ -35,11 +35,12 @@ type BooksDTO struct {
 }
 
 type InsertConditionDTO struct {
-	OccurredAt  time.Time `json:"occurredAt" validate:"required"`
-	Location    string    `json:"location" validate:"required,min=1,max=255"`
-	Device      string    `json:"device" validate:"required,min=1,max=255"`
-	Temperature float64   `json:"temperature" validate:"required"`
-	Humidity    float64   `json:"humidity" validate:"required"`
+	OccurredAt  time.Time              `json:"occurredAt" validate:"required"`
+	Location    string                 `json:"location" validate:"required,min=1,max=255"`
+	Device      string                 `json:"device" validate:"required,min=1,max=255"`
+	Temperature float64                `json:"temperature" validate:"required"`
+	Humidity    float64                `json:"humidity" validate:"required"`
+	Value       map[string]interface{} `json:"value" validate:"required"`
 }
 
 type BucketConditionDTO struct {

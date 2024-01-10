@@ -63,6 +63,40 @@ func (q *Queries) GetConditions(ctx context.Context, db DBTX) ([]GetConditionsRo
 	return items, nil
 }
 
+const getConditionsAverageValueField = `-- name: GetConditionsAverageValueField :many
+SELECT
+  time_bucket('1 day', time)::timestamptz AS bucket,
+  AVG((value->>($1)::text)::numeric) AS avg_value
+FROM conditions
+GROUP BY bucket
+ORDER BY bucket ASC
+`
+
+type GetConditionsAverageValueFieldRow struct {
+	Bucket   pgtype.Timestamptz
+	AvgValue float64
+}
+
+func (q *Queries) GetConditionsAverageValueField(ctx context.Context, db DBTX, dollar_1 string) ([]GetConditionsAverageValueFieldRow, error) {
+	rows, err := db.Query(ctx, getConditionsAverageValueField, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetConditionsAverageValueFieldRow
+	for rows.Next() {
+		var i GetConditionsAverageValueFieldRow
+		if err := rows.Scan(&i.Bucket, &i.AvgValue); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertBook = `-- name: InsertBook :one
 INSERT INTO books (title, author, description)
 VALUES ($1, $2, $3)
@@ -83,8 +117,8 @@ func (q *Queries) InsertBook(ctx context.Context, db DBTX, arg InsertBookParams)
 }
 
 const insertCondition = `-- name: InsertCondition :exec
-INSERT INTO conditions (time, location, device, temperature, humidity)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO conditions (time, location, device, temperature, humidity, value)
+VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type InsertConditionParams struct {
@@ -93,6 +127,7 @@ type InsertConditionParams struct {
 	Device      string
 	Temperature float64
 	Humidity    float64
+	Value       []byte
 }
 
 func (q *Queries) InsertCondition(ctx context.Context, db DBTX, arg InsertConditionParams) error {
@@ -102,6 +137,7 @@ func (q *Queries) InsertCondition(ctx context.Context, db DBTX, arg InsertCondit
 		arg.Device,
 		arg.Temperature,
 		arg.Humidity,
+		arg.Value,
 	)
 	return err
 }

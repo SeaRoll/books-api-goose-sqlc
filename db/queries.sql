@@ -29,5 +29,13 @@ GROUP BY bucket
 ORDER BY bucket ASC;
 
 -- name: InsertCondition :exec
-INSERT INTO conditions (time, location, device, temperature, humidity)
-VALUES ($1, $2, $3, $4, $5);
+INSERT INTO conditions (time, location, device, temperature, humidity, value)
+VALUES ($1, $2, $3, $4, $5, $6);
+
+-- name: GetConditionsAverageValueField :many
+SELECT
+  time_bucket('1 day', time)::timestamptz AS bucket,
+  AVG((value->>($1)::text)::numeric) AS avg_value
+FROM conditions
+GROUP BY bucket
+ORDER BY bucket ASC;

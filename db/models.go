@@ -21,4 +21,5 @@ type Condition struct {
 	Device      string
 	Temperature float64
 	Humidity    float64
+	Value       []byte
 }
