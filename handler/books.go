@@ -83,7 +83,7 @@ func UpdateBook(c echo.Context) error {
 		return returnServerError(c, err)
 	}
 
-	return returnSuccess(c, 201)
+	return returnSuccess(c, 200)
 }
 
 func DeleteBook(c echo.Context) error {
