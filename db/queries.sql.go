@@ -31,7 +31,7 @@ func (q *Queries) DeleteBook(ctx context.Context, db DBTX, id int32) error {
 }
 
 const getConditions = `-- name: GetConditions :many
-SELECT time_bucket('1 minute', time)::timestamptz AS bucket,
+SELECT time_bucket('1 day', time)::timestamptz AS bucket,
        avg(temperature) AS avg_temp
 FROM conditions
 GROUP BY bucket
@@ -91,8 +91,8 @@ type InsertConditionParams struct {
 	Time        pgtype.Timestamptz
 	Location    string
 	Device      string
-	Temperature pgtype.Float8
-	Humidity    pgtype.Float8
+	Temperature float64
+	Humidity    float64
 }
 
 func (q *Queries) InsertCondition(ctx context.Context, db DBTX, arg InsertConditionParams) error {
