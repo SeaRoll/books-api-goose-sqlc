@@ -15,6 +15,7 @@ func New() *echo.Echo {
 
 	// INIT ROUTES HERE
 	initBooksRoutes(e)
+	initConditionsRoutes(e)
 
 	return e
 }

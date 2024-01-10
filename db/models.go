@@ -19,6 +19,6 @@ type Condition struct {
 	Time        pgtype.Timestamptz
 	Location    string
 	Device      string
-	Temperature pgtype.Float8
-	Humidity    pgtype.Float8
+	Temperature float64
+	Humidity    float64
 }

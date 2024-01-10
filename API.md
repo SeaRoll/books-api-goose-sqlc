@@ -117,3 +117,62 @@ DELETE /api/v1/books/1
   "success": true
 }
 ```
+
+### Insert condition
+
+**Endpoint: /api/v1/conditions**
+
+**Method: POST**
+
+**Description:** Insert a new condition
+
+**Example Request**
+
+```sh
+POST /api/v1/conditions
+```
+
+**Example Request Body**
+
+```json
+{
+  "occurredAt": "2020-01-01T00:00:00.000Z",
+  "location": "Bedroom",
+  "device": "Thermometer",
+  "temperature": 20,
+  "humidity": 50
+}
+```
+
+**Example Response**
+
+```json
+{
+  "success": true
+}
+```
+
+### Get conditions (avg per day)
+
+**Endpoint: /api/v1/conditions**
+
+**Method: GET**
+
+**Description:** Retrieve list of conditions (avg per day)
+
+**Example Request**
+
+```sh
+GET /api/v1/conditions
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "day": "2020-01-01T00:00:00.000Z",
+    "avgTemp": 0.52348
+  }
+]
+```

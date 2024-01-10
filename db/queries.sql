@@ -22,7 +22,7 @@ WHERE id = $1;
 DELETE FROM books;
 
 -- name: GetConditions :many
-SELECT time_bucket('1 minute', time)::timestamptz AS bucket,
+SELECT time_bucket('1 day', time)::timestamptz AS bucket,
        avg(temperature) AS avg_temp
 FROM conditions
 GROUP BY bucket
