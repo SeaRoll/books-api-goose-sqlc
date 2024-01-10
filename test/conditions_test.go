@@ -53,4 +53,12 @@ func (suite *HandlerTestSuite) TestMassInsertions() {
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), 200, res.Code)
 	fmt.Println(res.Body.String())
+
+	groupedConditions := ParseBodyString[[]handler.BucketConditionDTO](res.Body)
+	assert.Equal(suite.T(), 10, len(groupedConditions))
+	for i := 0; i < 10; i++ {
+		assert.NotEmpty(suite.T(), groupedConditions[i].Day)
+		assert.GreaterOrEqual(suite.T(), groupedConditions[i].AvgTemp, 0.0)
+		assert.LessOrEqual(suite.T(), groupedConditions[i].AvgTemp, 1.0)
+	}
 }
