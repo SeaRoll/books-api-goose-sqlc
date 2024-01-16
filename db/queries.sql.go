@@ -7,16 +7,16 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"encoding/json"
+	"time"
 )
 
 const deleteAllBooks = `-- name: DeleteAllBooks :exec
 DELETE FROM books
 `
 
-func (q *Queries) DeleteAllBooks(ctx context.Context, db DBTX) error {
-	_, err := db.Exec(ctx, deleteAllBooks)
+func (q *Queries) DeleteAllBooks(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteAllBooks)
 	return err
 }
 
@@ -25,8 +25,8 @@ DELETE FROM books
 WHERE id = $1
 `
 
-func (q *Queries) DeleteBook(ctx context.Context, db DBTX, id int32) error {
-	_, err := db.Exec(ctx, deleteBook, id)
+func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteBook, id)
 	return err
 }
 
@@ -39,12 +39,12 @@ ORDER BY bucket ASC
 `
 
 type GetConditionsRow struct {
-	Bucket  pgtype.Timestamptz
-	AvgTemp float64
+	Bucket  time.Time `json:"bucket"`
+	AvgTemp float64   `json:"avg_temp"`
 }
 
-func (q *Queries) GetConditions(ctx context.Context, db DBTX) ([]GetConditionsRow, error) {
-	rows, err := db.Query(ctx, getConditions)
+func (q *Queries) GetConditions(ctx context.Context) ([]GetConditionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getConditions)
 	if err != nil {
 		return nil, err
 	}
@@ -56,6 +56,9 @@ func (q *Queries) GetConditions(ctx context.Context, db DBTX) ([]GetConditionsRo
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -73,12 +76,12 @@ ORDER BY bucket ASC
 `
 
 type GetConditionsAverageValueFieldRow struct {
-	Bucket   pgtype.Timestamptz
-	AvgValue float64
+	Bucket   time.Time `json:"bucket"`
+	AvgValue float64   `json:"avg_value"`
 }
 
-func (q *Queries) GetConditionsAverageValueField(ctx context.Context, db DBTX, dollar_1 string) ([]GetConditionsAverageValueFieldRow, error) {
-	rows, err := db.Query(ctx, getConditionsAverageValueField, dollar_1)
+func (q *Queries) GetConditionsAverageValueField(ctx context.Context, dollar_1 string) ([]GetConditionsAverageValueFieldRow, error) {
+	rows, err := q.db.QueryContext(ctx, getConditionsAverageValueField, dollar_1)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +93,9 @@ func (q *Queries) GetConditionsAverageValueField(ctx context.Context, db DBTX, d
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -104,13 +110,13 @@ RETURNING id
 `
 
 type InsertBookParams struct {
-	Title       string
-	Author      string
-	Description string
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
 
-func (q *Queries) InsertBook(ctx context.Context, db DBTX, arg InsertBookParams) (int32, error) {
-	row := db.QueryRow(ctx, insertBook, arg.Title, arg.Author, arg.Description)
+func (q *Queries) InsertBook(ctx context.Context, arg InsertBookParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, insertBook, arg.Title, arg.Author, arg.Description)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
@@ -122,16 +128,16 @@ VALUES ($1, $2, $3, $4, $5, $6)
 `
 
 type InsertConditionParams struct {
-	Time        pgtype.Timestamptz
-	Location    string
-	Device      string
-	Temperature float64
-	Humidity    float64
-	Value       []byte
+	Time        time.Time       `json:"time"`
+	Location    string          `json:"location"`
+	Device      string          `json:"device"`
+	Temperature float64         `json:"temperature"`
+	Humidity    float64         `json:"humidity"`
+	Value       json.RawMessage `json:"value"`
 }
 
-func (q *Queries) InsertCondition(ctx context.Context, db DBTX, arg InsertConditionParams) error {
-	_, err := db.Exec(ctx, insertCondition,
+func (q *Queries) InsertCondition(ctx context.Context, arg InsertConditionParams) error {
+	_, err := q.db.ExecContext(ctx, insertCondition,
 		arg.Time,
 		arg.Location,
 		arg.Device,
@@ -150,12 +156,12 @@ LIMIT $2
 `
 
 type ListBooksPagedParams struct {
-	Offset int32
-	Limit  int32
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
 }
 
-func (q *Queries) ListBooksPaged(ctx context.Context, db DBTX, arg ListBooksPagedParams) ([]Book, error) {
-	rows, err := db.Query(ctx, listBooksPaged, arg.Offset, arg.Limit)
+func (q *Queries) ListBooksPaged(ctx context.Context, arg ListBooksPagedParams) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksPaged, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +179,9 @@ func (q *Queries) ListBooksPaged(ctx context.Context, db DBTX, arg ListBooksPage
 		}
 		items = append(items, i)
 	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
@@ -186,14 +195,14 @@ WHERE id = $1
 `
 
 type UpdateBookParams struct {
-	ID          int32
-	Title       string
-	Author      string
-	Description string
+	ID          int32  `json:"id"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
 
-func (q *Queries) UpdateBook(ctx context.Context, db DBTX, arg UpdateBookParams) error {
-	_, err := db.Exec(ctx, updateBook,
+func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) error {
+	_, err := q.db.ExecContext(ctx, updateBook,
 		arg.ID,
 		arg.Title,
 		arg.Author,

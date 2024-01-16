@@ -5,21 +5,19 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 )
 
 func GetConditions(c echo.Context) error {
 	returnConditions := []BucketConditionDTO{}
-	err := db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries, tx pgx.Tx) error {
-		conditions, err := q.GetConditions(ctx, tx)
+	err := db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries) error {
+		conditions, err := q.GetConditions(ctx)
 		if err != nil {
 			return err
 		}
 		for _, condition := range conditions {
 			returnConditions = append(returnConditions, BucketConditionDTO{
-				Day:     condition.Bucket.Time.UTC(),
+				Day:     condition.Bucket.UTC(),
 				AvgTemp: condition.AvgTemp,
 			})
 		}
@@ -35,14 +33,14 @@ func GetConditions(c echo.Context) error {
 func GetConditionsJsonValue(c echo.Context) error {
 	valueKey := c.Param("key")
 	returnConditions := []BucketConditionDTO{}
-	err := db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries, tx pgx.Tx) error {
-		conditions, err := q.GetConditionsAverageValueField(ctx, tx, valueKey)
+	err := db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries) error {
+		conditions, err := q.GetConditionsAverageValueField(ctx, valueKey)
 		if err != nil {
 			return err
 		}
 		for _, condition := range conditions {
 			returnConditions = append(returnConditions, BucketConditionDTO{
-				Day:     condition.Bucket.Time.UTC(),
+				Day:     condition.Bucket.UTC(),
 				AvgTemp: condition.AvgValue,
 			})
 		}
@@ -71,12 +69,9 @@ func InsertCondition(c echo.Context) error {
 		return returnUserError(c, err)
 	}
 
-	err = db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries, tx pgx.Tx) error {
-		err := q.InsertCondition(ctx, tx, db.InsertConditionParams{
-			Time: pgtype.Timestamptz{
-				Time:  insertDTO.OccurredAt.UTC(),
-				Valid: true,
-			},
+	err = db.WithTX(c.Request().Context(), func(ctx context.Context, q *db.Queries) error {
+		err := q.InsertCondition(ctx, db.InsertConditionParams{
+			Time:        insertDTO.OccurredAt.UTC(),
 			Location:    insertDTO.Location,
 			Device:      insertDTO.Device,
 			Temperature: insertDTO.Temperature,

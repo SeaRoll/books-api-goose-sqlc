@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/suite"
 )
@@ -53,8 +52,8 @@ func (suite *HandlerTestSuite) TearDownSuite() {
 }
 
 func (suite *HandlerTestSuite) SetupTest() {
-	err := db.WithTX(context.Background(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		err := queries.DeleteAllBooks(ctx, tx)
+	err := db.WithTX(context.Background(), func(ctx context.Context, queries *db.Queries) error {
+		err := queries.DeleteAllBooks(ctx)
 		if err != nil {
 			return err
 		}
