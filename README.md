@@ -52,10 +52,9 @@ docker compose -f deployment/docker-compose.yml down
 │   ├── migrations              # database migrations
 │   ├── db.go                   # main database file (GENERATED)
 │   ├── dbo.go                  # Connecting to DB
-│   ├── queries.sql.go          # queries file (GENERATED)
-│   ├── models.sql              # models file (GENERATED)
 │   ├── queries.sql             # queries file
-│   └── migrator.sql            # goose migrator file
+│   ├── queries.sql.go          # queries file (GENERATED)
+│   ├── models.go               # models file (GENERATED)
 ├── deployment
 │   ├── Dockerfile              # dockerfile for building api
 │   ├── docker-compose.yml      # compose file for deploying db + api
