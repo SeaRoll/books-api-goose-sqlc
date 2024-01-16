@@ -5,21 +5,22 @@
 package db
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
+	"encoding/json"
+	"time"
 )
 
 type Book struct {
-	ID          int32
-	Title       string
-	Author      string
-	Description string
+	ID          int32  `json:"id"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Description string `json:"description"`
 }
 
 type Condition struct {
-	Time        pgtype.Timestamptz
-	Location    string
-	Device      string
-	Temperature float64
-	Humidity    float64
-	Value       []byte
+	Time        time.Time       `json:"time"`
+	Location    string          `json:"location"`
+	Device      string          `json:"device"`
+	Temperature float64         `json:"temperature"`
+	Humidity    float64         `json:"humidity"`
+	Value       json.RawMessage `json:"value"`
 }

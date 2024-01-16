@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,9 +23,9 @@ func mapBooks(books []db.Book) []BookDTO {
 
 func GetBooks(c echo.Context) error {
 	books := []db.Book{}
-	err := db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
+	err := db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries) error {
 		var err error
-		books, err = queries.ListBooksPaged(ctx, tx, db.ListBooksPagedParams{Limit: 10, Offset: 0})
+		books, err = queries.ListBooksPaged(ctx, db.ListBooksPagedParams{Limit: 10, Offset: 0})
 		return err
 	})
 	if err != nil {
@@ -46,8 +45,8 @@ func CreateBook(c echo.Context) error {
 		return returnUserError(c, err)
 	}
 
-	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		_, err := queries.InsertBook(ctx, tx, db.InsertBookParams{
+	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries) error {
+		_, err := queries.InsertBook(ctx, db.InsertBookParams{
 			Title:       insertParams.Title,
 			Author:      insertParams.Author,
 			Description: insertParams.Description,
@@ -71,8 +70,8 @@ func UpdateBook(c echo.Context) error {
 		return returnUserError(c, err)
 	}
 
-	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		return queries.UpdateBook(ctx, tx, db.UpdateBookParams{
+	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries) error {
+		return queries.UpdateBook(ctx, db.UpdateBookParams{
 			ID:          updateParams.ID,
 			Title:       updateParams.Title,
 			Author:      updateParams.Author,
@@ -97,8 +96,8 @@ func DeleteBook(c echo.Context) error {
 		return returnUserError(c, err)
 	}
 
-	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries, tx pgx.Tx) error {
-		return queries.DeleteBook(ctx, tx, idInt)
+	err = db.WithTX(c.Request().Context(), func(ctx context.Context, queries *db.Queries) error {
+		return queries.DeleteBook(ctx, idInt)
 	})
 	if err != nil {
 		return returnServerError(c, err)
