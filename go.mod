@@ -57,7 +57,7 @@ require (
 
 require (
 	github.com/go-playground/validator/v10 v10.17.0
-	github.com/jackc/pgx/v5 v5.5.2
+	github.com/jackc/pgx/v5 v5.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/ory/dockertest/v3 v3.10.0
